@@ -245,7 +245,7 @@ def summarize_text(text):
     
     # Score each sentence
     for i, sentence in enumerate(sentences):
-        sentence_words = word_tokenize(sentence.lower())
+        sentence_words = sentence.lower().split()
         score = 0
         
         # Word frequency score

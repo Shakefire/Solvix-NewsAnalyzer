@@ -6,7 +6,6 @@ import plotly.express as px
 from datetime import datetime
 import folium
 from streamlit_folium import st_folium
-from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -152,27 +151,36 @@ if page == "Main Classifier":
                         
                         # Create word cloud of important features
                         if feature_importance:
-                            # Convert feature importance to word cloud format
-                            wordcloud_data = {}
-                            for word, importance in feature_importance.items():
-                                wordcloud_data[word] = abs(importance) * 100
+                            # Create columns for feature visualization and feature list
+                            exp_col1, exp_col2 = st.columns(2)
                             
-                            if wordcloud_data:
-                                # Create columns for word cloud and feature list
-                                exp_col1, exp_col2 = st.columns(2)
+                            with exp_col1:
+                                st.write("**Important Words Visualization:**")
+                                # Create a simple bar chart instead of word cloud
+                                sorted_features = sorted(
+                                    feature_importance.items(),
+                                    key=lambda x: abs(x[1]),
+                                    reverse=True
+                                )[:10]
                                 
-                                with exp_col1:
-                                    st.write("**Word Cloud of Important Features:**")
-                                    wordcloud = WordCloud(
-                                        width=400, height=300,
-                                        background_color='white',
-                                        colormap='RdYlBu_r'
-                                    ).generate_from_frequencies(wordcloud_data)
+                                if sorted_features:
+                                    words, importances = zip(*sorted_features)
+                                    colors = ['red' if imp > 0 else 'blue' for imp in importances]
                                     
-                                    fig_wc, ax = plt.subplots(figsize=(8, 6))
-                                    ax.imshow(wordcloud, interpolation='bilinear')
-                                    ax.axis('off')
-                                    st.pyplot(fig_wc)
+                                    fig_features = go.Figure(data=[
+                                        go.Bar(
+                                            y=list(words),
+                                            x=[abs(imp) for imp in importances],
+                                            orientation='h',
+                                            marker_color=colors
+                                        )
+                                    ])
+                                    fig_features.update_layout(
+                                        title="Important Words (Red=Fake, Blue=Real)",
+                                        height=400,
+                                        margin=dict(l=120, r=20, t=40, b=20)
+                                    )
+                                    st.plotly_chart(fig_features, use_container_width=True)
                                 
                                 with exp_col2:
                                     st.write("**Top Important Words:**")
@@ -543,7 +551,7 @@ elif page == "Chat Verification":
         with st.chat_message("assistant"):
             with st.spinner("Checking facts..."):
                 # Simple response generation based on keywords
-                response = generate_fact_check_response(prompt)
+                response = f"I'm analyzing your query: '{prompt}'. Based on general fact-checking principles, I recommend verifying claims through multiple reliable sources, checking for official statements, and looking for peer-reviewed research. For specific fact-checking, please consult established fact-checking organizations like Snopes, PolitiFact, or FactCheck.org."
                 st.write(response)
                 
                 # Add assistant response to chat history

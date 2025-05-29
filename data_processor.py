@@ -2,20 +2,6 @@ import re
 import numpy as np
 from textblob import TextBlob
 from collections import Counter
-import nltk
-from nltk.tokenize import word_tokenize, sent_tokenize
-from nltk.corpus import stopwords
-
-# Download required NLTK data
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
-
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
 
 def analyze_sentiment(text):
     """Analyze sentiment of the text using TextBlob."""
@@ -145,12 +131,18 @@ def process_text(text):
     if not text:
         return {}
     
-    # Basic text statistics
-    sentences = sent_tokenize(text)
-    words = word_tokenize(text)
+    # Basic text statistics  
+    sentences = re.split(r'[.!?]+', text)
+    sentences = [s.strip() for s in sentences if s.strip()]
+    words = text.split()
     
     # Remove stopwords for analysis
-    stop_words = set(stopwords.words('english'))
+    stop_words = {
+        'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+        'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
+        'to', 'was', 'will', 'with', 'the', 'this', 'but', 'they', 'have',
+        'had', 'what', 'said', 'each', 'which', 'do', 'how', 'their', 'if'
+    }
     content_words = [word.lower() for word in words if word.isalpha() and word.lower() not in stop_words]
     
     # Calculate readability metrics
@@ -200,8 +192,12 @@ def extract_keywords(text, num_keywords=10):
         return []
     
     # Tokenize and clean text
-    words = word_tokenize(text.lower())
-    stop_words = set(stopwords.words('english'))
+    words = text.lower().split()
+    stop_words = {
+        'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+        'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
+        'to', 'was', 'will', 'with', 'the', 'this', 'but', 'they', 'have'
+    }
     
     # Filter words
     content_words = [
@@ -279,7 +275,8 @@ def analyze_claims_density(text):
     if not text:
         return {}
     
-    sentences = sent_tokenize(text)
+    sentences = re.split(r'[.!?]+', text)
+    sentences = [s.strip() for s in sentences if s.strip()]
     
     # Claim indicators
     claim_patterns = [
