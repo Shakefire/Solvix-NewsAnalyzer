@@ -1,4 +1,13 @@
 import streamlit as st
+
+# Page configuration - MUST be first Streamlit command
+st.set_page_config(
+    page_title="Data Analysis Dashboard",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
@@ -29,14 +38,6 @@ def load_model():
     return FakeNewsClassifier()
 
 model = load_model()
-
-# Page configuration
-st.set_page_config(
-    page_title="Fake News Detection System",
-    page_icon="🔍",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Main title
 st.title("🔍 Fake News Detection System")
