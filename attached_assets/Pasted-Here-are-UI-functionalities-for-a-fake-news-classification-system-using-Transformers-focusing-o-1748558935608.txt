@@ -1,0 +1,67 @@
+Here are UI functionalities for a **fake news classification system using Transformers**, focusing only on the **user interface (UI) features**:
+
+---
+
+### ✅ **UI Functionalities (With Transformers)**
+
+1. **News Text Input Panel**
+
+   * Upload article or paste news content
+   * Real-time input validation and word count
+
+2. **Model Prediction Display**
+
+   * "Real" or "Fake" label with confidence score
+   * Animated result card with classification result
+
+3. **Explainability Overlay**
+
+   * Highlight important words influencing the model’s prediction (using attention or SHAP)
+   * Toggle view for interpretability on/off
+
+4. **Source Trust Meter**
+
+   * Visual badge or meter showing source credibility
+   * Tooltip with historical reliability stats
+
+5. **Claim Verification Panel**
+
+   * Extracted claims from the news text
+   * Button to verify each claim against a fact-check database
+
+6. **Image/Text Dual Analysis**
+
+   * Upload image (if article includes one)
+   * Separate fake news prediction for text, image, and combined
+
+7. **Bias & Sentiment Chart**
+
+   * Display sentiment polarity and political bias gauge
+   * Visualization chart (radar/bar) for tone, stance, and emotion
+
+8. **Simplify & Summarize Button**
+
+   * Toggle to view simplified or summarized version of the article
+   * Show both original and processed versions side-by-side
+
+9. **Confidence Meter & History**
+
+   * Circular or progress bar confidence visualization
+   * Table of past predictions with timestamps and user feedback
+
+10. **User Feedback & Voting System**
+
+* Thumbs up/down on model's prediction
+* Optional feedback comment box for user opinions
+
+11. **Interactive Chatbot for Verification**
+
+* Ask specific questions about article content
+* Chat interface that fetches real-time fact-check info
+
+12. **Geolocation Claim Map**
+
+* Map visualization showing claimed event locations
+* Link to real-time news data or fact-check results
+Also, it should be streamlit, models for training in model.iynb should not be transformers or complex algorithms 
+
