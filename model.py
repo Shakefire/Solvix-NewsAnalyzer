@@ -9,22 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 import joblib
 import re
-import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem import PorterStemmer
 import streamlit as st
-
-# Download required NLTK data
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
-
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
 
 class FakeNewsClassifier:
     def __init__(self):
@@ -45,8 +30,19 @@ class FakeNewsClassifier:
         }
         
         self.ensemble_model = None
-        self.stemmer = PorterStemmer()
-        self.stop_words = set(stopwords.words('english'))
+        # Simple stopwords list (offline)
+        self.stop_words = {
+            'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+            'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
+            'to', 'was', 'will', 'with', 'the', 'this', 'but', 'they', 'have',
+            'had', 'what', 'said', 'each', 'which', 'do', 'how', 'their', 'if',
+            'up', 'out', 'many', 'then', 'them', 'these', 'so', 'some', 'her',
+            'would', 'make', 'like', 'into', 'him', 'time', 'two', 'more',
+            'very', 'when', 'come', 'may', 'see', 'get', 'use', 'your', 'way',
+            'about', 'just', 'first', 'also', 'new', 'because', 'day', 'more',
+            'other', 'after', 'back', 'little', 'only', 'round', 'man', 'year',
+            'came', 'show', 'every', 'good', 'me', 'give', 'our', 'under', 'name'
+        }
         
         # Train the model with sample data
         self._train_initial_model()
@@ -62,17 +58,29 @@ class FakeNewsClassifier:
         # Remove special characters and digits
         text = re.sub(r'[^a-zA-Z\s]', '', text)
         
-        # Tokenize
-        tokens = word_tokenize(text)
+        # Simple tokenization (split on whitespace)
+        tokens = text.split()
         
-        # Remove stopwords and stem
+        # Remove stopwords and short words
         processed_tokens = []
         for token in tokens:
             if token not in self.stop_words and len(token) > 2:
-                stemmed_token = self.stemmer.stem(token)
+                # Simple stemming - remove common suffixes
+                stemmed_token = self._simple_stem(token)
                 processed_tokens.append(stemmed_token)
         
         return ' '.join(processed_tokens)
+    
+    def _simple_stem(self, word):
+        """Simple stemming function to replace PorterStemmer."""
+        # Remove common suffixes
+        suffixes = ['ing', 'ed', 'er', 'est', 'ly', 'tion', 'ness', 'ment']
+        
+        for suffix in suffixes:
+            if word.endswith(suffix) and len(word) > len(suffix) + 2:
+                return word[:-len(suffix)]
+        
+        return word
     
     def _generate_sample_data(self):
         """Generate sample training data for the model."""

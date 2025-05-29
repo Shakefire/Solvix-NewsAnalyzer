@@ -1,24 +1,17 @@
 import re
 import random
 from datetime import datetime
-import nltk
-from nltk.tokenize import sent_tokenize, word_tokenize
 from textblob import TextBlob
 import streamlit as st
-
-# Download required NLTK data
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
 
 def extract_claims(text):
     """Extract factual claims from news text."""
     if not text:
         return []
     
-    # Tokenize into sentences
-    sentences = sent_tokenize(text)
+    # Simple sentence tokenization
+    sentences = re.split(r'[.!?]+', text)
+    sentences = [s.strip() for s in sentences if s.strip()]
     
     claims = []
     claim_indicators = [
@@ -44,9 +37,9 @@ def extract_claims(text):
         # Check for fact patterns
         has_fact_pattern = any(re.search(pattern, sentence_lower) for pattern in fact_patterns)
         
-        # Check for entities (proper nouns)
-        words = word_tokenize(sentence)
-        proper_nouns = [word for word in words if word[0].isupper() and len(word) > 1]
+        # Check for entities (proper nouns) - simple tokenization
+        words = sentence.split()
+        proper_nouns = [word for word in words if word and word[0].isupper() and len(word) > 1]
         has_entities = len(proper_nouns) >= 2
         
         # Determine if this sentence contains a claim
@@ -124,8 +117,9 @@ def get_source_credibility(text):
     blob = TextBlob(text)
     
     # Simple grammar check based on sentence structure
-    sentences = sent_tokenize(text)
-    avg_sentence_length = sum(len(word_tokenize(s)) for s in sentences) / len(sentences) if sentences else 0
+    sentences = re.split(r'[.!?]+', text)
+    sentences = [s.strip() for s in sentences if s.strip()]
+    avg_sentence_length = sum(len(s.split()) for s in sentences) / len(sentences) if sentences else 0
     
     if 10 <= avg_sentence_length <= 25:  # Reasonable sentence length
         factors['Language Quality'] += 0.3
@@ -188,7 +182,8 @@ def simplify_text(text):
         return ""
     
     # Split into sentences
-    sentences = sent_tokenize(text)
+    sentences = re.split(r'[.!?]+', text)
+    sentences = [s.strip() for s in sentences if s.strip()]
     simplified_sentences = []
     
     for sentence in sentences:
@@ -213,7 +208,7 @@ def simplify_text(text):
             simplified = re.sub(r'\b' + complex_word + r'\b', simple_word, simplified, flags=re.IGNORECASE)
         
         # Break down long sentences
-        if len(word_tokenize(simplified)) > 20:
+        if len(simplified.split()) > 20:
             # Simple sentence splitting at conjunctions
             conjunctions = [' and ', ' but ', ' however ', ' although ']
             for conj in conjunctions:
@@ -232,7 +227,8 @@ def summarize_text(text):
     if not text:
         return ""
     
-    sentences = sent_tokenize(text)
+    sentences = re.split(r'[.!?]+', text)
+    sentences = [s.strip() for s in sentences if s.strip()]
     
     if len(sentences) <= 3:
         return text
@@ -241,7 +237,7 @@ def summarize_text(text):
     sentence_scores = {}
     
     # Get word frequencies
-    words = word_tokenize(text.lower())
+    words = text.lower().split()
     word_freq = {}
     for word in words:
         if word.isalpha() and len(word) > 2:
